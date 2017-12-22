@@ -149,7 +149,8 @@ void*m_realloc(void* ptr, size_t size)
 {
   p_meta data_ptr,newdata;
   int flag;
-
+  void *new_ptr;
+  
   if (ptr<=0) return m_malloc(size);
 
   flag=size/4;
@@ -175,10 +176,18 @@ void*m_realloc(void* ptr, size_t size)
     return ptr;
   } 
   
-  void *new_ptr;
-  new_ptr=m_malloc(size);
+  if (find_meta(&data_ptr,size))
+  {
+    m_free(ptr);
+    new_ptr=m_malloc(size);
+  }
+  else
+  {
+    new_ptr=m_malloc(size);
+    m_free(ptr);
+  }
   if (new_ptr<=0) return NULL;
   memcpy(new_ptr,ptr,size);  
-  m_free(ptr);
-  return new_ptr;
+  
+ return new_ptr;
 }
